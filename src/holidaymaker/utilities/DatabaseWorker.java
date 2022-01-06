@@ -12,6 +12,12 @@ public class DatabaseWorker {
         connection = DriverManager.getConnection("jdbc:sqlite:Holidaymaker.db");
     }
 
+    public void disconnect() throws SQLException {
+        if (connection != null) {
+            connection.close();
+        }
+    }
+
     public int registerCustomer(String firstName, String lastName, String dateOfBirth, String phoneNumber, String emailAddress) {
         int id = 0;
         String query = "INSERT INTO Customers(First_name, Last_name, Date_of_birth, Phone_number, Email_address)" +

@@ -5,6 +5,7 @@ import holidaymaker.utilities.DatabaseWorker;
 import holidaymaker.utilities.Dialogs;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class HolidaymakerConsole {
 
@@ -47,7 +48,6 @@ public class HolidaymakerConsole {
             System.exit(1);
         }
         Thread.sleep(500);
-        System.out.println("-".repeat(welcomeMessage.length()));
     }
 
     private void showMainMenu() {
@@ -67,8 +67,21 @@ public class HolidaymakerConsole {
                 editBooking();
                 break;
             case 5:
-                System.out.println("Closing Holidaymaker administrator console...\nGoodbye!");
-                System.exit(0);
+                String goodbyeMessage = "Closing Holidaymaker administrator console...";
+                try {
+                    System.out.print("-".repeat(goodbyeMessage.length()));
+                    System.out.println();
+                    System.out.println(goodbyeMessage);
+                    databaseWorker.disconnect();
+                    Thread.sleep(500);
+                    System.out.println("Goodbye!");
+                    System.exit(0);
+                } catch (SQLException ignore) {
+                    System.out.println("An error occurred while closing the connection with the database. Closing console...");
+                    System.exit(1);
+                } catch (InterruptedException ignore) {
+                    System.exit(2);
+                }
         }
     }
 
@@ -78,16 +91,48 @@ public class HolidaymakerConsole {
         String dateOfBirth = Dialogs.readStringInput("Please input customer's date of birth");
         String phoneNumber = Dialogs.readStringInput("Please input customer's phone number");
         String emailAddress = Dialogs.readStringInput("Please input customer's email address");
-        int id = databaseWorker.registerCustomer(firstName, lastName, dateOfBirth, phoneNumber, emailAddress);
-        System.out.println("Customer registered in the database.");
-        selectedCustomer = new Customer(firstName, lastName, dateOfBirth, phoneNumber, emailAddress);
-        selectedCustomer.setId(id);
-        showMainMenu();
+        int option = Dialogs.showDialog("Confirm registration?", "Yes", "No");
+        switch (option) {
+            case 1:
+                int id = databaseWorker.registerCustomer(firstName, lastName, dateOfBirth, phoneNumber, emailAddress);
+                System.out.println("Customer registered in the database.");
+                selectedCustomer = new Customer(firstName, lastName, dateOfBirth, phoneNumber, emailAddress);
+                selectedCustomer.setId(id);
+                break;
+            case 2:
+                showMainMenu();
+                break;
+        }
     }
 
     private void selectCustomer() {
-
-        selectedCustomer = databaseWorker.selectCustomer(1, "1");
+        ArrayList<String> values = new ArrayList<>();
+        int option = Dialogs.showDialog("Please select a search option", "Find customer by Id",
+                "Find customer by name and date of birth", "Find customer by phone number", "Find customer by email address", "Go back to main menu");
+        switch (option) {
+            case 1:
+                int input = Dialogs.readIntInput("Please enter customer Id");
+                values.add(Integer.toString(input));
+                break;
+            case 2:
+                values.add(Dialogs.readStringInput("Please enter customer's first name"));
+                values.add(Dialogs.readStringInput("Please enter customer's last name"));
+                values.add(Dialogs.readStringInput("Please enter customer's date of birth"));
+                break;
+            case 3:
+                values.add(Dialogs.readStringInput("Please enter customer's phone number"));
+                break;
+            case 4:
+                values.add(Dialogs.readStringInput("Please enter customer's email address"));
+                break;
+            case 5:
+                showMainMenu();
+                break;
+        }
+        selectedCustomer = databaseWorker.selectCustomer(1, values.toArray(new String[0]));
+        System.out.println("Selected customer:");
+        System.out.println(selectedCustomer);
+        showMainMenu();
     }
 
     private void searchForRooms() {

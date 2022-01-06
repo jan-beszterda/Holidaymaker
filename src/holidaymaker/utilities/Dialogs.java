@@ -23,14 +23,14 @@ public class Dialogs {
                 charCount = option.length();
             }
         }
-        if (text.isEmpty()) {
+        if (text.isEmpty() || text.length() < charCount) {
             charCount += 3;
         }
         if (!text.isEmpty()) {
             System.out.println("-".repeat(charCount));
             System.out.println(text);
-            System.out.println("-".repeat(charCount));
         }
+        System.out.println("-".repeat(charCount));
         for (int i = 0; i < options.length; i++) {
             System.out.println(i+1 + ". " + options[i]);
         }
@@ -65,6 +65,26 @@ public class Dialogs {
     }
 
     /**
+     *
+     * @param prompt
+     * @return
+     */
+    public static int readIntInput(String prompt) {
+        System.out.print("-".repeat(prompt.length()));
+        System.out.println();
+        System.out.println(prompt);
+        System.out.print("Your answer: ");
+        int answer;
+        try {
+            answer = Integer.parseInt(scanner.nextLine());
+        } catch (Exception ignore) {
+            System.out.println("Wrong input");
+            answer = readIntInput(prompt);
+        }
+        return answer;
+    }
+
+    /**
      * Method responsible for reading text input from the user.
      * @param prompt question to ask the user
      * @return text answer from the user
@@ -72,6 +92,8 @@ public class Dialogs {
     public static String readStringInput(String prompt) {
         String answer = "";
         while (answer.isEmpty()) {
+            System.out.print("-".repeat(prompt.length()));
+            System.out.println();
             System.out.println(prompt);
             System.out.print("Your answer: ");
             answer = scanner.nextLine();
