@@ -85,6 +85,30 @@ public class Dialogs {
     }
 
     /**
+     *
+     * @param prompt
+     * @return
+     */
+    public static int readIntInput(String prompt, int min, int max) {
+        System.out.print("-".repeat(prompt.length()));
+        System.out.println();
+        System.out.println(prompt);
+        System.out.print("Your answer: ");
+        int answer;
+        try {
+            answer = Integer.parseInt(scanner.nextLine());
+            if ( answer < min || answer > max) {
+                System.out.println("Wrong input");
+                answer = readIntInput(prompt, min, max);
+            }
+        } catch (Exception ignore) {
+            System.out.println("Wrong input");
+            answer = readIntInput(prompt, min, max);
+        }
+        return answer;
+    }
+
+    /**
      * Method responsible for reading text input from the user.
      * @param prompt question to ask the user
      * @return text answer from the user
