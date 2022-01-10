@@ -2,16 +2,12 @@ package holidaymaker;
 
 import holidaymaker.console.HolidaymakerConsole;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
-
-        System.out.println(timestamp);
-
-        //new HolidaymakerConsole();
+        new HolidaymakerConsole();
     }
 }

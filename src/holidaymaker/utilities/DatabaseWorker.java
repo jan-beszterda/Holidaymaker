@@ -1,9 +1,6 @@
 package holidaymaker.utilities;
 
-import holidaymaker.datamodels.Customer;
-import holidaymaker.datamodels.Hotel;
-import holidaymaker.datamodels.Room;
-import holidaymaker.datamodels.SearchResult;
+import holidaymaker.datamodels.*;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -15,6 +12,8 @@ public class DatabaseWorker {
 
     public void connect() throws SQLException {
         connection = DriverManager.getConnection("jdbc:sqlite:Holidaymaker.db");
+        Statement s = connection.createStatement();
+        s.executeUpdate("PRAGMA foreign_keys = ON; ");
     }
 
     public void disconnect() throws SQLException {
@@ -138,7 +137,7 @@ public class DatabaseWorker {
         return customer;
     }
 
-    public SearchResult searchForRooms(int numberOfBeds, String startDate, String endDate, boolean pool, boolean restaurant, boolean childrenClub, boolean entertainment) {
+    public RoomSearchResult searchForRooms(int numberOfBeds, String startDate, String endDate, boolean pool, boolean restaurant, boolean childrenClub, boolean entertainment) {
         ArrayList<Room> rooms = new ArrayList<>();
         ArrayList<Hotel> hotels = new ArrayList<>();
         ArrayList<String> columns = new ArrayList<>();
@@ -148,7 +147,7 @@ public class DatabaseWorker {
                 "Hotel.Entertainment AS Entertainment FROM Room " +
                 "INNER JOIN Hotel ON Room.Hotel_Id = Hotel.Id " +
                 "WHERE Room.Number_of_beds = ? AND Room.Id NOT IN " +
-                "(SELECT Room.Id FROM Booking_details WHERE Start_date < ? AND End_date > ?)";
+                "(SELECT Room_Id FROM Booking_details WHERE Start_date < ? AND End_date > ?)";
         if (pool) {
             roomQuery += " AND Hotel.Pool = 'Yes'";
         }
@@ -180,20 +179,19 @@ public class DatabaseWorker {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return new SearchResult(rooms, hotels, columns);
+        return new RoomSearchResult(rooms, hotels, columns);
     }
 
-    public void bookRooms(int customerId, HashMap<Integer, Integer> selectedRooms, String startDate, String endDate) {
+    public int bookRooms(int customerId, HashMap<Integer, Integer> selectedRooms, String startDate, String endDate) {
         int bookingId = 0;
         String query = "INSERT INTO Booking (Customer_Id, Timestamp) VALUES(?, ?)";
-        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        dateFormat.setCalendar(c);
-        String timestamp = dateFormat.format(c.getTime());
         try{
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, customerId);
-            statement.setString(2, timestamp);
+            Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            dateFormat.setCalendar(c);
+            statement.setString(2, dateFormat.format(c.getTime()));
             statement.executeUpdate();
             ResultSet keys = statement.getGeneratedKeys();
             while (keys.next()){
@@ -207,15 +205,80 @@ public class DatabaseWorker {
             try {
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setInt(1, bookingId);
-                statement.setInt(1, entry.getValue());
-                statement.setInt(1, entry.getKey());
-                statement.setString(2, startDate);
-                statement.setString(2, endDate);
+                statement.setInt(2, entry.getValue());
+                statement.setInt(3, entry.getKey());
+                statement.setString(4, startDate);
+                statement.setString(5, endDate);
                 statement.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
+        return bookingId;
     }
 
+    public void registerGuest(int bookingId, String firstName, String lastName, String phoneNumber, String emailAddress, String dateOfBirth) {
+        String query = "INSERT INTO Guests(Booking_Id, First_name, Last_name, Phone_number, Email_address, Date_of_birth)" +
+                "VALUES(?, ?, ?, ?, ?, ?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, bookingId);
+            statement.setString(2, firstName);
+            statement.setString(3, lastName);
+            statement.setString(4, phoneNumber);
+            statement.setString(5, emailAddress);
+            statement.setString(6, dateOfBirth);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public BookingSearchResult searchForBookings(int id) {
+        ArrayList<Booking> bookings = new ArrayList<>();
+        ArrayList<BookingDetail> bookingDetails = new ArrayList<>();
+        ArrayList<String> columns = new ArrayList<>();
+        String query = "SELECT Booking.Id AS 'Booking Id', Booking.Customer_Id AS'Customer Id', Timestamp, Booking_details.Id, " +
+                "Booking_details.Booking_Id, Booking_details.Hotel_Id AS 'Hotel Id', Booking_details.Room_Id AS 'Room Id', " +
+                "Booking_details.Start_date AS 'Start date', Booking_details.End_date AS 'End date' FROM Booking " +
+                "INNER JOIN Booking_details ON Booking.Id = Booking_details.Booking_Id WHERE Booking.Customer_Id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                    columns.add(metaData.getColumnName(i));
+                }
+                bookings.add(new Booking(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3)));
+                bookingDetails.add(new BookingDetail(resultSet.getInt(4), resultSet.getInt(5), resultSet.getInt(6),
+                        resultSet.getInt(7), resultSet.getString(8), resultSet.getString(9)));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new BookingSearchResult(bookings, bookingDetails, columns);
+    }
+
+    public void cancelBookings(ArrayList<Integer> bookingIds) {
+        String query = "DELETE FROM Booking WHERE Id IN (";
+        for (int i = 0; i < bookingIds.size(); i++) {
+            if (i != bookingIds.size()-1) {
+                query += "?, ";
+            } else {
+                query += "?";
+            }
+        }
+        query += ")";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            for (int i = 1; i <= bookingIds.size(); i++) {
+                statement.setInt(i, bookingIds.get(i-1));
+            }
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -1,6 +1,8 @@
 package holidaymaker.utilities;
 
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Dialog class is responsible for processing user input into console.
@@ -49,7 +51,7 @@ public class Dialogs {
         if (max == 0) {
             max = Integer.MAX_VALUE;
         }
-        System.out.print("Your answer: ");
+        System.out.print(">>: ");
         int answer;
         try {
             answer = Integer.parseInt(scanner.nextLine());
@@ -73,7 +75,7 @@ public class Dialogs {
         System.out.print("-".repeat(prompt.length()));
         System.out.println();
         System.out.println(prompt);
-        System.out.print("Your answer: ");
+        System.out.print(">>: ");
         int answer;
         try {
             answer = Integer.parseInt(scanner.nextLine());
@@ -93,7 +95,7 @@ public class Dialogs {
         System.out.print("-".repeat(prompt.length()));
         System.out.println();
         System.out.println(prompt);
-        System.out.print("Your answer: ");
+        System.out.print(">>: ");
         int answer;
         try {
             answer = Integer.parseInt(scanner.nextLine());
@@ -113,15 +115,33 @@ public class Dialogs {
      * @param prompt question to ask the user
      * @return text answer from the user
      */
-    public static String readStringInput(String prompt) {
+    public static String readStringInput(String prompt, String inputPattern) {
         String answer = "";
-        while (answer.isEmpty()) {
+        Pattern pattern = Pattern.compile(inputPattern);
+        Matcher matcher;
+        do {
             System.out.print("-".repeat(prompt.length()));
             System.out.println();
             System.out.println(prompt);
-            System.out.print("Your answer: ");
+            System.out.print(">>: ");
             answer = scanner.nextLine();
-        }
+            matcher = pattern.matcher(answer);
+            if (answer.isEmpty() || !matcher.matches()) {
+                System.out.println("Incorrect input. Please try again.");
+            }
+        } while (answer.isEmpty() || !matcher.matches());
+        return answer;
+    }
+
+    public static String readStringInput(String prompt) {
+        String answer = "";
+        do {
+            System.out.print("-".repeat(prompt.length()));
+            System.out.println();
+            System.out.println(prompt);
+            System.out.print(">>: ");
+            answer = scanner.nextLine();
+        } while (answer.isEmpty());
         return answer;
     }
 
