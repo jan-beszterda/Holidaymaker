@@ -1,5 +1,9 @@
 package holidaymaker.datamodels;
 
+/**
+ * Hotel class provides data model for hotel information
+ * @author Jan Beszterda
+ */
 public class Hotel {
 
     private int id;
@@ -11,15 +15,6 @@ public class Hotel {
     private String entertainment;
 
     public Hotel() {
-    }
-
-    public Hotel(String name, String address, String pool, String restaurant, String childrenClub, String entertainment) {
-        this.name = name;
-        this.address = address;
-        this.pool = pool;
-        this.restaurant = restaurant;
-        this.childrenClub = childrenClub;
-        this.entertainment = entertainment;
     }
 
     public Hotel(int id, String name, String address, String pool, String restaurant, String childrenClub, String entertainment) {

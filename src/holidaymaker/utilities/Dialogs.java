@@ -44,7 +44,7 @@ public class Dialogs {
      * Method responsible for reading numeric input from the user.
      * @param min minimum number allowed
      * @param max maximum number allowed
-     * @return number chosen by the player
+     * @return number chosen by the user
      */
     public static int readIntInput(int min, int max) {
         //System.out.println("-".repeat(20));
@@ -67,9 +67,9 @@ public class Dialogs {
     }
 
     /**
-     *
-     * @param prompt
-     * @return
+     * Method responsible for reading numeric input from the user.
+     * @param prompt question to display to the user
+     * @return number provided by the user
      */
     public static int readIntInput(String prompt) {
         System.out.print("-".repeat(prompt.length()));
@@ -87,9 +87,11 @@ public class Dialogs {
     }
 
     /**
-     *
-     * @param prompt
-     * @return
+     * Method responsible for reading numeric input from the user.
+     * @param prompt question to display to the user
+     * @param min minimum number allowed
+     * @param max maximum number allowed
+     * @return number chosen by the user
      */
     public static int readIntInput(String prompt, int min, int max) {
         System.out.print("-".repeat(prompt.length()));
@@ -113,6 +115,7 @@ public class Dialogs {
     /**
      * Method responsible for reading text input from the user.
      * @param prompt question to ask the user
+     * @param inputPattern regex pattern the input must be checked against
      * @return text answer from the user
      */
     public static String readStringInput(String prompt, String inputPattern) {
@@ -133,6 +136,11 @@ public class Dialogs {
         return answer;
     }
 
+    /**
+     * Method responsible for reading text input from the user.
+     * @param prompt question to ask the user
+     * @return text answer from the user
+     */
     public static String readStringInput(String prompt) {
         String answer = "";
         do {

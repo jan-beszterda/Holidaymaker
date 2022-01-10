@@ -2,6 +2,11 @@ package holidaymaker.datamodels;
 
 import java.util.ArrayList;
 
+/**
+ * BookingSearchResult class provides data model for the result of the search for customer's bookings operation.
+ * It contains data returned from the database about bookings and booking details along with table column names.
+ * @author Jan Beszterda
+ */
 public class BookingSearchResult {
 
     private ArrayList<Booking> bookings;

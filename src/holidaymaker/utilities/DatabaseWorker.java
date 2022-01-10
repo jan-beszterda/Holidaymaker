@@ -6,22 +6,44 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+
+/**
+ * DatabaseWorker class is responsible for interacting with the database and execute operations on the database.
+ * @author Jan Beszterda
+ */
 public class DatabaseWorker {
 
     private Connection connection = null;
 
+    /**
+     * Method responsible for establishing connection with the database and enabling foreign key constraints
+     * @throws SQLException exception thrown if the connection or statement execution fails
+     */
     public void connect() throws SQLException {
         connection = DriverManager.getConnection("jdbc:sqlite:Holidaymaker.db");
         Statement s = connection.createStatement();
         s.executeUpdate("PRAGMA foreign_keys = ON; ");
     }
 
+    /**
+     * Method responsible for closing the connection with the database
+     * @throws SQLException exception thrown if closing the connection fails
+     */
     public void disconnect() throws SQLException {
         if (connection != null) {
             connection.close();
         }
     }
 
+    /**
+     * Method responsible for inserting customer's data into the database
+     * @param firstName customer's first name
+     * @param lastName customer's last name
+     * @param dateOfBirth customer's date of birth
+     * @param phoneNumber customer's phone number
+     * @param emailAddress customer's email address
+     * @return id number generated for the newly registered customer
+     */
     public int registerCustomer(String firstName, String lastName, String dateOfBirth, String phoneNumber, String emailAddress) {
         int id = 0;
         String query = "INSERT INTO Customers(First_name, Last_name, Date_of_birth, Phone_number, Email_address)" +
@@ -44,6 +66,12 @@ public class DatabaseWorker {
         return id;
     }
 
+    /**
+     * Entry method responsible for searching through the database for specific customer
+     * @param option search option chosen by the user
+     * @param values search values provided by the user
+     * @return customer's data from the database as a customer object
+     */
     public Customer selectCustomer(int option, String... values) {
         Customer customer = null;
         switch (option) {
@@ -63,6 +91,11 @@ public class DatabaseWorker {
         return customer;
     }
 
+    /**
+     * Method responsible for finding customer in the database by their phone number
+     * @param value the phone number typed in by the user
+     * @return customer's data from the database as a customer object
+     */
     private Customer selectCustomerByPhoneNumber(String value) {
         Customer customer = null;
         String query = "SELECT * FROM Customers WHERE Phone_number = ?";
@@ -81,6 +114,11 @@ public class DatabaseWorker {
         return customer;
     }
 
+    /**
+     * Method responsible for finding customer in the database by their email address
+     * @param value the email address typed in by the user
+     * @return customer's data from the database as a customer object
+     */
     private Customer selectCustomerByEmailAddress(String value) {
         Customer customer = null;
         String query = "SELECT * FROM Customers WHERE Email_address = ?";
@@ -99,6 +137,11 @@ public class DatabaseWorker {
         return customer;
     }
 
+    /**
+     * Method responsible for finding customer in the database by their first name, last name and date of birth combination
+     * @param values customer's first name, last name and date of birth combination typed in by the user
+     * @return customer's data from the database as a customer object
+     */
     private Customer selectCustomerByFullNameAndBirthDate(String[] values) {
         Customer customer = null;
         String query = "SELECT * FROM Customers WHERE First_name = ? AND Last_name = ? AND Date_of_birth = ?";
@@ -119,6 +162,11 @@ public class DatabaseWorker {
         return customer;
     }
 
+    /**
+     * Method responsible for finding customer in the database by their id number
+     * @param value the id number typed in by the user
+     * @return customer's data from the database as a customer object
+     */
     private Customer selectCustomerById(String value) {
         Customer customer = null;
         String query = "SELECT * FROM Customers WHERE Id = ?";
@@ -137,6 +185,17 @@ public class DatabaseWorker {
         return customer;
     }
 
+    /**
+     * Method responsible for finding available rooms based on the conditions typed in by the user
+     * @param numberOfBeds number of beds in the room
+     * @param startDate check-in date
+     * @param endDate check-out date
+     * @param pool access to the pool (true/false)
+     * @param restaurant access to the restaurant (true/false)
+     * @param childrenClub access to the children club (true/false)
+     * @param entertainment access to the entertainment (true/false)
+     * @return object containing search results
+     */
     public RoomSearchResult searchForRooms(int numberOfBeds, String startDate, String endDate, boolean pool, boolean restaurant, boolean childrenClub, boolean entertainment) {
         ArrayList<Room> rooms = new ArrayList<>();
         ArrayList<Hotel> hotels = new ArrayList<>();
@@ -182,6 +241,14 @@ public class DatabaseWorker {
         return new RoomSearchResult(rooms, hotels, columns);
     }
 
+    /**
+     * Method responsible for creating the booking
+     * @param customerId id number of the customer making the booking
+     * @param selectedRooms map of room-hotel id pairs selected by the customer
+     * @param startDate check-in date
+     * @param endDate check-out date
+     * @return booking id number
+     */
     public int bookRooms(int customerId, HashMap<Integer, Integer> selectedRooms, String startDate, String endDate) {
         int bookingId = 0;
         String query = "INSERT INTO Booking (Customer_Id, Timestamp) VALUES(?, ?)";
@@ -217,6 +284,15 @@ public class DatabaseWorker {
         return bookingId;
     }
 
+    /**
+     * Method responsible for inserting guests data into the database
+     * @param bookingId booking id number guest belong to
+     * @param firstName guest's first name
+     * @param lastName guest's last name
+     * @param phoneNumber guest's phone number
+     * @param emailAddress guest's email address
+     * @param dateOfBirth guest's date of birth
+     */
     public void registerGuest(int bookingId, String firstName, String lastName, String phoneNumber, String emailAddress, String dateOfBirth) {
         String query = "INSERT INTO Guests(Booking_Id, First_name, Last_name, Phone_number, Email_address, Date_of_birth)" +
                 "VALUES(?, ?, ?, ?, ?, ?)";
@@ -234,6 +310,11 @@ public class DatabaseWorker {
         }
     }
 
+    /**
+     * Method responsible for searching through the database for bookings made by specific customer
+     * @param id customer's id number
+     * @return object containing search results
+     */
     public BookingSearchResult searchForBookings(int id) {
         ArrayList<Booking> bookings = new ArrayList<>();
         ArrayList<BookingDetail> bookingDetails = new ArrayList<>();
@@ -261,6 +342,10 @@ public class DatabaseWorker {
         return new BookingSearchResult(bookings, bookingDetails, columns);
     }
 
+    /**
+     * Method responsible for cancelling the bookings and deleting all related information from the database
+     * @param bookingIds list of booking id numbers to cancel
+     */
     public void cancelBookings(ArrayList<Integer> bookingIds) {
         String query = "DELETE FROM Booking WHERE Id IN (";
         for (int i = 0; i < bookingIds.size(); i++) {

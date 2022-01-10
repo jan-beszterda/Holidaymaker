@@ -1,2 +1,3 @@
 # Holidaymaker
-Repository for school project
+Repository for school project - Holidaymaker
+Owner & author - Jan Beszterda

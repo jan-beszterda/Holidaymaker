@@ -1,5 +1,9 @@
 package holidaymaker.datamodels;
 
+/**
+ * Booking class provides data model for booking information
+ * @author Jan Beszterda
+ */
 public class Booking {
 
     private int id;

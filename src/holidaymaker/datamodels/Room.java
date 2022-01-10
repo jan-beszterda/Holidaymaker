@@ -1,5 +1,9 @@
 package holidaymaker.datamodels;
 
+/**
+ * Room class provides data model for room data
+ * @author Jan Beszterda
+ */
 public class Room {
 
     private int id;
@@ -9,14 +13,6 @@ public class Room {
     private int number;
 
     public Room() {
-
-    }
-
-    public Room(String name, int numberOfBeds, int hotelId, int number) {
-        this.name = name;
-        this.numberOfBeds = numberOfBeds;
-        this.hotelId = hotelId;
-        this.number = number;
     }
 
     public Room(int id, String name, int numberOfBeds, int hotelId, int number) {

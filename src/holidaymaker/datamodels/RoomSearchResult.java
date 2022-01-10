@@ -2,6 +2,11 @@ package holidaymaker.datamodels;
 
 import java.util.ArrayList;
 
+/**
+ * RoomSearchResult class provides data model for the result of the search for available rooms operation. It contains
+ * data returned from the database about rooms and hotels along with table column names.
+ * @author Jan Beszterda
+ */
 public class RoomSearchResult {
 
 

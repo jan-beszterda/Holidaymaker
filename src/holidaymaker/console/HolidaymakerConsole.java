@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- *
+ * HolidaymakerConsole class responsible for interacting between the user and database.
  * @author Jan Beszterda
  */
 public class HolidaymakerConsole {
@@ -17,17 +17,27 @@ public class HolidaymakerConsole {
     private Customer selectedCustomer;
     private DatabaseWorker databaseWorker;
 
-    public HolidaymakerConsole() throws InterruptedException {
+    /**
+     * Constructor of the HolidaymakerConsole objects. Initialises the application and transfers user to main menu.
+     */
+    public HolidaymakerConsole() {
         this.selectedCustomer = null;
         this.databaseWorker = new DatabaseWorker();
         initialiseConsole();
         showMainMenu();
     }
 
-    private void initialiseConsole() throws InterruptedException {
+    /**
+     * Method initialises connection with the database and displays welcome message.
+     */
+    private void initialiseConsole() {
         System.out.print("Connecting to the database");
         for (int i = 0; i < 5; i++) {
-            Thread.sleep(200);
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             System.out.print(".");
         }
         try {
@@ -56,6 +66,9 @@ public class HolidaymakerConsole {
         System.out.println("-".repeat(welcomeMessage.length()));
     }
 
+    /**
+     * Method displays main menu and processes user's choice of further action.
+     */
     private void showMainMenu() {
         if (this.selectedCustomer != null) {
             String customerInfo = this.selectedCustomer.toString();
@@ -90,6 +103,9 @@ public class HolidaymakerConsole {
         }
     }
 
+    /**
+     * Method finalises the application, disconnects the database and displays goodbye message.
+     */
     private void quit() {
         String goodbyeMessage = "Closing connection with the database...";
         try {
@@ -109,6 +125,9 @@ public class HolidaymakerConsole {
         }
     }
 
+    /**
+     * Method allows user to register new customer in the database.
+     */
     private void registerCustomer() {
         String firstName = Dialogs.readStringInput("Please input customer's first name", "^[A-Z\\p{L}][a-z\\p{L}]+(?>[ -]?[A-Z\\p{L}][a-z\\p{L}]+){0,2}$");
         String lastName = Dialogs.readStringInput("Please input customer's last name", "^[A-Z\\p{L}][a-z\\p{L}]+(?>[ -]?[A-Z\\p{L}][a-z\\p{L}]+){0,3}$");
@@ -130,6 +149,9 @@ public class HolidaymakerConsole {
         }
     }
 
+    /**
+     * Method allows user to select an existing customer from the database.
+     */
     private void selectCustomer() {
         ArrayList<String> values = new ArrayList<>();
         int option = Dialogs.showDialog("Please select a search option", "Find customer by Id",
@@ -177,6 +199,10 @@ public class HolidaymakerConsole {
         }
     }
 
+    /**
+     * Method allows user to search for bookings of specific customer.
+     * @param id customer's id number
+     */
     private void viewBookings(int id) {
         BookingSearchResult bookingSearchResult = databaseWorker.searchForBookings(id);
         if (bookingSearchResult.getColumns().isEmpty()) {
@@ -194,6 +220,9 @@ public class HolidaymakerConsole {
         }
     }
 
+    /**
+     * Method allows user to search for available rooms based on provided search conditions.
+     */
     private void searchForRooms() {
         int input;
         if (this.selectedCustomer == null) {
@@ -258,6 +287,13 @@ public class HolidaymakerConsole {
         }
     }
 
+    /**
+     * Method allows to create a booking in the database.
+     * @param numberOfGuests number of guests to register in the booking
+     * @param startDate check-in date
+     * @param endDate check-out date
+     * @param roomSearchResult result object of the search method containing data about available rooms and hotels
+     */
     private void createBooking(int numberOfGuests, String startDate, String endDate, RoomSearchResult roomSearchResult) {
         int bookingId;
         HashMap<Integer, Integer> selectedRooms = selectRooms(roomSearchResult.getRooms());
@@ -269,6 +305,11 @@ public class HolidaymakerConsole {
         showMainMenu();
     }
 
+    /**
+     * Method allows the user to register guests details in the booking
+     * @param bookingId booking number these guests belong to
+     * @param maxGuestsNumber maximum number of guests to register as provided by customer
+     */
     private void registerGuests(int bookingId, int maxGuestsNumber) {
         int answer = 0;
         databaseWorker.registerGuest(bookingId, this.selectedCustomer.getFirstName(), this.selectedCustomer.getLastName(), this.selectedCustomer.getPhoneNumber(), this.selectedCustomer.getEmailAddress(), this.selectedCustomer.getDateOfBirth());
@@ -289,6 +330,11 @@ public class HolidaymakerConsole {
         }
     }
 
+    /**
+     * Method allows the user to select booking numbers to cancel
+     * @param bookings list of bookings of a selected customer
+     * @return list of booking id numbers
+     */
     private ArrayList<Integer> selectBookings(ArrayList<Booking> bookings) {
         ArrayList<Integer> selectedBookings = new ArrayList<>();
         int answer = 0;
@@ -314,7 +360,11 @@ public class HolidaymakerConsole {
         return selectedBookings;
     }
 
-
+    /**
+     * Method allows the user to select room-hotel id pairs to book
+     * @param rooms List of rooms found by search method
+     * @return map of room-hotel id pairs
+     */
     private HashMap<Integer, Integer> selectRooms(ArrayList<Room> rooms) {
         HashMap<Integer, Integer> selectedRooms = new HashMap<>();
         int answer = 0;
@@ -339,8 +389,11 @@ public class HolidaymakerConsole {
         }
         return selectedRooms;
     }
-    
-    
+
+    /**
+     * Method responsible for processing and displaying room search result
+     * @param roomSearchResult result of the room search
+     */
     private void displayRoomSearchResults(RoomSearchResult roomSearchResult) {
         System.out.print("-".repeat(225));
         System.out.println();
@@ -362,6 +415,10 @@ public class HolidaymakerConsole {
         System.out.println();
     }
 
+    /**
+     * Method responsible for processing and displaying booking search result
+     * @param bookingSearchResult result of the booking search
+     */
     private void displayBookingSearchResults(BookingSearchResult bookingSearchResult) {
         System.out.print("-".repeat(89));
         System.out.println();
@@ -381,6 +438,10 @@ public class HolidaymakerConsole {
         System.out.println();
     }
 
+    /**
+     * Method allows the user to cancel selected bookings
+     * @param bookingIds list of booking id numbers
+     */
     private void editBooking(ArrayList<Integer> bookingIds) {
         if (bookingIds == null) {
             bookingIds = new ArrayList<>();

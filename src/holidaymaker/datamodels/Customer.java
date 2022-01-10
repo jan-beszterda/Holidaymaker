@@ -1,5 +1,9 @@
 package holidaymaker.datamodels;
 
+/**
+ * Customer class provides a data model for the customers' data
+ * @author Jan Beszterda
+ */
 public class Customer {
 
     private int id;
