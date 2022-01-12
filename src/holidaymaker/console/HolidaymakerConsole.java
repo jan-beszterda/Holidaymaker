@@ -130,7 +130,7 @@ public class HolidaymakerConsole {
      */
     private void registerCustomer() {
         String firstName = Dialogs.readStringInput("Please input customer's first name", "^[A-Z\\p{L}][a-z\\p{L}]+(?>[ -]?[A-Z\\p{L}][a-z\\p{L}]+){0,2}$");
-        String lastName = Dialogs.readStringInput("Please input customer's last name", "^[A-Z\\p{L}][a-z\\p{L}]+(?>[ -]?[A-Z\\p{L}][a-z\\p{L}]+){0,3}$");
+        String lastName = Dialogs.readStringInput("Please input customer's last name", "^[A-Z\\p{L}][']?[a-z\\p{L}]+(?>[ -]?[A-Z\\p{L}][a-z\\p{L}]+){0,3}$");
         String dateOfBirth = Dialogs.readStringInput("Please input customer's date of birth", "^[0-9]{4}-[0-9]{2}-[0-9]{2}$");
         String phoneNumber = Dialogs.readStringInput("Please input customer's phone number", "^[+][0-9]{1,3}[ -]?[0-9]{1,4}[ -]?[0-9]{2,4}[ -]?[0-9]{2,4}$");
         String emailAddress = Dialogs.readStringInput("Please input customer's email address", "^[a-zA-Z0-9._]{2,}[@][a-zA-Z0-9-]*[.]?[a-zA-Z0-9-]{2,}[.][a-z]{2,}$");
@@ -318,7 +318,7 @@ public class HolidaymakerConsole {
                 answer = Dialogs.showDialog("Do you want to register another guest (remaining guests to register: " + (maxGuestsNumber - i) + ")", "Yes", "No, finish booking");
                 if (answer == 1) {
                     String firstName = Dialogs.readStringInput("Please enter guest's first name", "^[A-Z\\p{L}][a-z\\p{L}]+(?>[ -]?[A-Z\\p{L}][a-z\\p{L}]+){0,2}$");
-                    String lastName = Dialogs.readStringInput("Please enter guest's last name", "^[A-Z\\p{L}][a-z\\p{L}]+(?>[ -]?[A-Z\\p{L}][a-z\\p{L}]+){0,3}$");
+                    String lastName = Dialogs.readStringInput("Please enter guest's last name", "^[A-Z\\p{L}][']?[a-z\\p{L}]+(?>[ -]?[A-Z\\p{L}][a-z\\p{L}]+){0,3}$");
                     String phoneNumber = Dialogs.readStringInput("Please enter guest's phone number", "^[+][0-9]{1,3}[ -]?[0-9]{1,4}[ -]?[0-9]{2,4}[ -]?[0-9]{2,4}$");
                     String emailAddress = Dialogs.readStringInput("Please enter guest's email address", "^[a-zA-Z0-9._]{2,}[@][a-zA-Z0-9-]*[.]?[a-zA-Z0-9-]{2,}[.][a-z]{2,}$");
                     String dateOfBirth = Dialogs.readStringInput("Please enter guest's date of birth", "^[0-9]{4}-[0-9]{2}-[0-9]{2}$");
